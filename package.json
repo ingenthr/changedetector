@@ -1,12 +1,19 @@
 {
-  "name": "beersample-node",
-  "description": "Beers and Breweries application using node.",
+  "name": "couchbase-changedetector",
+  "description": "Track changes to Couchbase Metrics.",
   "version": "0.0.2",
   "private": true,
   "dependencies": {
     "underscore": "~1.5.1",
 	  "express": "~3.3.7",
 	  "jade": "~0.35.0",
-    "couchbase": "2.0.0"
+    "couchbase": "2.0.2",
+    "q": "~1.1.2",
+    "aws-sdk": "~2.1.4",
+    "config": "~1.11.0",
+    "js-yaml": "3.2.6"
+  },
+  "devDependencies": {
+    "mocha": "~2.1.0"
   }
 }

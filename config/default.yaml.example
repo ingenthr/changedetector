@@ -1,0 +1,8 @@
+logdata-connstr: couchbase://localhost/
+logdata-bucket: s3logs
+logdata-password: letmein
+
+cache-connstr: couchbase://localhost/
+cache-bucket: s3logs_cache
+cache-password: letmein
+

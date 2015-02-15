@@ -1,8 +1,11 @@
 extends layout
 block content
-  h3 Overview Graphs
-  p This should appear at the top.
-  canvas#overview
+  h3 Download Overview
+  p
+  canvas#overview(width=750, height=400)
+  p#overview-legend
+  .span12
+    p#errors
   .span12
   h4 About this App
   p Couchbase Change Detector

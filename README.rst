@@ -9,7 +9,7 @@ couchnode is not straight forward as it uses libcouchbase_ and a C++ binding to
 libcouchbase. Refer to couchnode_ project for installation instructions.
 
 Make sure that you connect with a valid couchbase server and have the
-``beer-sample`` bucket installed.  `beer_designs.js` sets up view design docs
+``beer-sample`` bucket installed.  `s3counts_designs.js` sets up view design docs
 used by this application. To setup the additional design documents,
 
 .. code-block:: bash

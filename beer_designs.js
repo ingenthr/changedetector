@@ -1,7 +1,6 @@
 var couchbase = require('couchbase');
 
-// Setup design documents for beers and breweries to index beer-documents
-// based on beer-names and index brewery-documents based on brewery-names.
+// Setup design documents.
 
 // The following functions acts synchronously so that we can know when to safely
 //   exit.  This is a workaround for a current bug in the client that stops node

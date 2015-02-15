@@ -1,3 +1,5 @@
 node_modules
+clustercert.txt
 *.swp
 /.idea/
+config/default.yaml
