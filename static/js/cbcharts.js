@@ -3580,7 +3580,7 @@ function get_chart_data2(input) {
     var dict_prod_download_by_concat = {};
 
 
-    console.log("working with input " + JSON.stringify(input) + "\r\n\r\n");
+    //console.log("working with input " + JSON.stringify(input) + "\r\n\r\n");
     input.map(function(entry) {
 
         // later we'll need this for extracting the data for the array
@@ -3635,7 +3635,6 @@ function get_chart_data2(input) {
     for(var date_period in dict_chart_datapoints) {
         if (dict_chart_datapoints.hasOwnProperty(date_period)) {
 
-            console.log("date as array is " + JSON.stringify(date_period));
             labels.push(date_period);
 
             //var entryColor = genColor(oneprop);
@@ -3706,16 +3705,11 @@ function get_chart_data2(input) {
         _.map(dict_product_dataarr, function (item, key) {
             var concat_key = labels[i] + ":" + key; // 2nd label here is the one for the chart data
             var new_element = dict_prod_download_by_concat[concat_key];
-            console.log("adding this piece of data :" + JSON.stringify(concat_key) + "\r\nwhich is :" +
-              JSON.stringify(new_element) );
             if (typeof new_element === "undefined") {
-                console.log("undefined, so adding a ZERO");
                 item.data.push(0);
             } else {
                 item.data.push(new_element);
             }
-            console.log("now have " + JSON.stringify(item));
-
         })
 
     }
