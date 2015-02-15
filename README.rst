@@ -1,48 +1,21 @@
-Beers and Breweries application using node.
+An S3 Log Change Detector
 -------------------------------------------
 
-This is a sample web application written with the node.js and couchnode 
-library.
+This app will graph the number of requests for a full object (in this case,
+to determine the number of full downloads) based on S3 log files imported
+into a Couchbase bucket and looking at S3 to find the object size itself.
 
-We are using couchnode library for accessing couchbase database. Installing
-couchnode is not straight forward as it uses libcouchbase_ and a C++ binding to
-libcouchbase. Refer to couchnode_ project for installation instructions.
+Dependencies
+------------
 
-Make sure that you connect with a valid couchbase server and have the
-``beer-sample`` bucket installed.  `s3counts_designs.js` sets up view design docs
-used by this application. To setup the additional design documents,
+A Couchbase cluster with two buckets, one cache and one for the data.
 
-.. code-block:: bash
+A connection to an S3 bucket with log data.
 
-    node beer.js --setup     // --setup switch will setup the design document.
+Credentials required to make this app run
+-----------------------------------------
 
-Following is the gist of what the map function does with `beer` documents,
+AWS creds for S3 in ~/.aws/config
 
-``beer/by_name``::
+Bucket connection info in `config/default.yaml`, see the example.
 
-    function(doc, meta) {
-        if (doc.type && doc.type == "beer") {
-            emit(doc.name, null);
-        }
-    }
-
-Following is the gist of what the map function does with `brewery` documents,
-
-``brewery/by_name``::
-
-    function(doc, meta) {
-        if (doc.type && doc.type == "brewery") {
-            emit(doc.name, null);
-        }
-    }
-
-
-To run the webapp, simply do::
-
-    node beer.js
-
-And connect to ``localhost:1337``
-
-.. _npm: https://npmjs.org/
-.. _libcouchbase: https://github.com/couchbase/libcouchbase
-.. _couchnode: https://github.com/couchbase/couchnode
