@@ -2,8 +2,15 @@ extends layout
 block content
   h3 Download Overview
   p
-  canvas#overview(width=750, height=400)
+  canvas#overview(width=750, height=600)
   p#overview-legend
+  p
+      form.form-horizontal(id="charti_form")
+          label Start Date
+          input.span3(id="start_date", type="text", name="start_date", value="2014,10")
+          label End Date
+          input.span3(id="end_date", type="text", name="end_date", value="2015,3")
+          input.btn(id="update", type="Update", value="update")
   .span12
     p#errors
   .span12

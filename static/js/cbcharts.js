@@ -3773,13 +3773,29 @@ function post_fetch_render() {
     var overviewBarChart = new Chart(ctx).Bar(newChartData, overviewChartOptions);
     //var overviewBarChart = new Chart(ctx).Bar(mock_data, overviewChartOptions);
     var legend = overviewBarChart.generateLegend();
-    $('#overview-legend').append(legend);
-    //console.log("you're looking at " + JSON.stringify(chartData));
+    $('#overview-legend').replaceWith(legend);
+    console.log("you're looking at " + JSON.stringify(serverData));
 }
+
 //when really running, use this
-$.getJSON("/downloads/server?start_range=%5B2014%2C10%5D&end_range=%5B2015%2C3%5D", {}, function(data){
+$.getJSON(get_query_string(), {}, function(data){
     serverData = data;
     post_fetch_render();
+});
+
+// rerender from here
+function get_query_string() {
+    return "/downloads/server?start_range=" +
+        encodeURIComponent("[" + ($("#start_date").val() + "]")) + "&end_range=" +
+        encodeURIComponent("[" + ($("#end_date").val()) + "]");
+}
+$("#update").bind( "click", function() {
+    var request_string = get_query_string();
+    $.getJSON(request_string, {}, function(data){
+        serverData = data;
+        post_fetch_render();
+    });
+    console.log("request_string is: " + request_string);
 });
 
 // use this if offline
