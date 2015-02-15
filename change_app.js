@@ -475,7 +475,6 @@ exports.is_server_download = is_server_download;
               }
           });
       } finally {
-          console.log("Could not reach cache, continuing.");
           inner_all_releases();
       }
 
