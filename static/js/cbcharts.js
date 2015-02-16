@@ -3585,7 +3585,9 @@ function get_chart_data2(input) {
 
         // later we'll need this for extracting the data for the array
         // TODO: add to support day
-        dict_prod_download_by_concat[entry.path[0]+"-"+entry.path[1]+":"+entry.path[2]] = entry.num_downloads;
+        var zero_padded_month = "0" + entry.path[1];
+        zero_padded_month = zero_padded_month.substr(zero_padded_month.length-2);
+        dict_prod_download_by_concat[entry.path[0]+"-"+zero_padded_month+":"+entry.path[2]] = entry.num_downloads;
 
         offset = entry.path.length - 1;
 
@@ -3610,9 +3612,6 @@ function get_chart_data2(input) {
                 item: entry.path[offset],
                 dl_num: entry.num_downloads };
 
-
-            var zero_padded_month = "0" + entry.path[1];
-            zero_padded_month = zero_padded_month.substr(zero_padded_month.length-2);
             var key = entry.path[0] + "-" + zero_padded_month;
             if (typeof dict_chart_datapoints[key] === "undefined") {
                 // add new entry
@@ -3716,7 +3715,7 @@ function get_chart_data2(input) {
 
     _.map(dict_product_dataarr, function (item, key) {
         var total_dl = 0;
-        var dl_threshold = 25;
+        var dl_threshold = 3;
         for (i=0;i<item.data.length;i++) {
             total_dl += item.data[i];
         }
