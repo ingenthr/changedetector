@@ -3720,7 +3720,7 @@ function get_chart_data2(input) {
 
     _.map(dict_product_dataarr, function (item, key) {
         var total_dl = 0;
-        var dl_threshold = 3;
+        var dl_threshold = $("#dl_filter").val();
         for (i=0;i<item.data.length;i++) {
             total_dl += item.data[i];
         }
@@ -3757,7 +3757,7 @@ ctx.translate(0.5, 0.5);
 
 //legendTemplate takes a template as a string, you can populate the template with values from your dataset
 var overviewChartOptions = {
-    legendTemplate : '<ol>'
+    legendTemplate : '<ol id=\"overview-legend\">'
     +'<% for (var i=0; i<datasets.length; i++) { %>'
     +'<li>'
     +'<span style=\"background-color:<%=datasets[i].fillColor%>\">'
