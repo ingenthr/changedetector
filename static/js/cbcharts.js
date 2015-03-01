@@ -3712,15 +3712,15 @@ function get_chart_data2(input) {
             if (typeof new_element === "undefined") {
                 item.data.push(0);
             } else {
-                item.data.push(new_element);
+                item.data.push(Math.round(new_element));
             }
         })
 
     }
 
+    var dl_threshold = $("#dl_filter").val();
     _.map(dict_product_dataarr, function (item, key) {
         var total_dl = 0;
-        var dl_threshold = $("#dl_filter").val();
         for (i=0;i<item.data.length;i++) {
             total_dl += item.data[i];
         }
