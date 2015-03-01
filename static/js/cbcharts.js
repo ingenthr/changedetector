@@ -1,6 +1,11 @@
 //var _ = require(["underscore"]);
 
+// globals
+var CHART_WIDTH = 750;
+var CHART_HEIGHT = 400;
+
 var tail_re = /.*\/(.*)$/;
+
 
 var olddata = {
     labels: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
@@ -3748,6 +3753,7 @@ function genColor(str) {
 }
 
 var ctx = $("#overview").get(0).getContext("2d");
+ctx.translate(0.5, 0.5);
 
 //legendTemplate takes a template as a string, you can populate the template with values from your dataset
 var overviewChartOptions = {
@@ -3766,14 +3772,17 @@ var overviewChartOptions = {
 var serverData;
 
 function post_fetch_render() {
+    $('#overview').attr({width:CHART_WIDTH,height:CHART_HEIGHT}).css({width:'750px',height:'400px'});
     //var chartData = get_chart_data(serverData);
     var newChartData = get_chart_data2(serverData);
+    var canvas = $('overview');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     //console.log("old chart data\r\n" + JSON.stringify(chartData) + "\r\n\r\n new chart data\r\n" + JSON.stringify(newChartData) + "\r\n");
+    ctx.translate(0.5, 0.5);
     var overviewBarChart = new Chart(ctx).Bar(newChartData, overviewChartOptions);
     //var overviewBarChart = new Chart(ctx).Bar(mock_data, overviewChartOptions);
     var legend = overviewBarChart.generateLegend();
     $('#overview-legend').replaceWith(legend);
-    console.log("you're looking at " + JSON.stringify(serverData));
 }
 
 //when really running, use this
