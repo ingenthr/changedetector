@@ -115,7 +115,7 @@ function load_a_file(the_file) {
         //console.log("From S3, loading " + params.Key);
         if (err) console.log(err, err.stack); // an error occurred
         else{
-            db.insert(the_file, data.Body.toString(), {}, function(error, result) {
+            db.insert(the_file, data.Body.toString(), {"operationTimeout": 30000}, function(error, result) {
                 if (error) console.log(error, error.stack);
             })
         }
