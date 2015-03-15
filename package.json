@@ -11,7 +11,8 @@
     "q": "~1.1.2",
     "aws-sdk": "~2.1.4",
     "config": "~1.11.0",
-    "js-yaml": "3.2.6"
+    "js-yaml": "3.2.6",
+    "yargs": "3.4.5"
   },
   "devDependencies": {
     "mocha": "~2.1.0"
