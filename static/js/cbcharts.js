@@ -3771,6 +3771,31 @@ var overviewChartOptions = {
 //console.log("After formatting with get_chart_data: \r\n" + JSON.stringify(get_chart_data(input_data)));
 var serverData;
 
+var aggr_server_data = function (serverData) {
+
+    var aggrRes = serverData;
+    //var tail_re = /.*\/(.*)$/;
+    // releases/3.0.2/couchbase-server-enterprise_3.0.2-windows_x86.exe
+    //var ce_ee_re = /(.*)\/(.*)\/(.*)_(.*)_(.*)/;
+    //var test_re = /(.*)_(.*)_(.*)/;
+    var ce_ee_re = /.*couchbase-server-(.*)_|-.*/;
+
+    var num_ce;
+
+    // if CE and EE are grouped
+    _.map(serverData, function(item) {
+        console.log(JSON.stringify(item));
+        var re_results = ce_ee_re.exec(item.path[2]);
+        console.log(JSON.stringify(re_results));
+        if (ce_ee_re.test(item.path[2])) {
+            // set aside for now
+        }
+    });
+
+    return aggrRes;
+};
+
+var overviewBarChart = null;
 function post_fetch_render() {
     $('#overview').attr({width:CHART_WIDTH,height:CHART_HEIGHT}).css({width:'750px',height:'400px'});
     //var chartData = get_chart_data(serverData);
@@ -3778,9 +3803,12 @@ function post_fetch_render() {
     var canvas = $('overview');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     //console.log("old chart data\r\n" + JSON.stringify(chartData) + "\r\n\r\n new chart data\r\n" + JSON.stringify(newChartData) + "\r\n");
+    //console.log("new chart data\r\n" + JSON.stringify(newChartData) + "\r\n");
     ctx.translate(0.5, 0.5);
-    var overviewBarChart = new Chart(ctx).Bar(newChartData, overviewChartOptions);
-    //var overviewBarChart = new Chart(ctx).Bar(mock_data, overviewChartOptions);
+    if (overviewBarChart) {
+        overviewBarChart.destroy();
+    }
+    overviewBarChart = new Chart(ctx).Bar(newChartData, overviewChartOptions);
     var legend = overviewBarChart.generateLegend();
     $('#overview-legend').replaceWith(legend);
 }
@@ -3804,6 +3832,17 @@ $("#update").bind( "click", function() {
         post_fetch_render();
     });
     console.log("request_string is: " + request_string);
+});
+
+$("#aggr_ce_ee li").children().bind("click", function(jq_event) {
+    alert(JSON.stringify(jq_event.target.id));
+    //jq_event.target.addClass("active");
+});
+
+//when really running, use this
+$.getJSON(get_query_string(), {}, function(data){
+    serverData = data;
+    post_fetch_render();
 });
 
 // use this if offline

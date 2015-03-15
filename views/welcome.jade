@@ -12,6 +12,12 @@ block content
           input.span3(id="end_date", type="text", name="end_date", value="2015,3")
           label Filter Less Than
           input.span3(id="dl_filter", type="text", name="dl_filter", value="10")
+          label CE/EE Releases
+          ul.nav.nav-pills#aggr_ce_ee
+              li.active
+               a#aggr_ce_ee_grouped Grouped
+              li
+               a#aggr_ce_ee_separate Separate
           input.btn(id="update", type="Update", value="update")
   .span12
     p#errors
