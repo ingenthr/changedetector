@@ -537,7 +537,7 @@ exports.is_server_download = is_server_download;
     }
 
     var query = ViewQuery.from('analytics', 's3counts')
-        .stale(ViewQuery.Update.NONE)
+        .stale(ViewQuery.Update.AFTER)
       //.group(3)  buggy owing to CB Server 3.0.1 change, though JSCBC shouldn't have done that
         .custom({group_level: range_start.length +1 }) // +1 because of the product
         .custom({full_set: true})
