@@ -10,7 +10,7 @@ var argv = require('yargs').argv;
 var BUCKET = 's3-logs.couchbase.com';
 var config = require('config');
 var db, cache;
-var LOAD_CONCUR = 350;
+var LOAD_CONCUR = 128;
 
 // connection configuration to pass on to couchbase.connect(). Note that
 // while connecting with the server we are also opening the beer-sample
@@ -18,7 +18,8 @@ var LOAD_CONCUR = 350;
 var logdata_config = {
     connstr : config.get('logdata-connstr'),
     bucket : config.get('logdata-bucket'),
-    password : config.get('logdata-password')
+    password : config.get('logdata-password'),
+    operationTimeout : 65536
 };
 
 var logcache_config = {
@@ -107,7 +108,7 @@ function get_all_files() {
 
 function load_a_file(the_file, curr_num, when_done) {
     //console.log("loading " + the_file + "...");
-    console.log("loading number " + curr_num);
+    //console.log("loading number " + curr_num);
     var params = {
         Bucket: BUCKET, /* required */
         Key: the_file /* required */
@@ -118,11 +119,11 @@ function load_a_file(the_file, curr_num, when_done) {
             console.log(err, err.stack);
         } // an error occurred
         else{
-            db.insert(the_file, data.Body.toString(), {"operationTimeout": 60000}, function(error, result) {
+            db.insert(the_file, data.Body.toString(), {}, function(error, result) {
                 if (error) {
                     console.log('finished ' + curr_num + ' WITH ERROR', error, error.stack);
                 } else {
-                    console.log('finished ' + curr_num);
+                    //console.log('finished ' + curr_num);
                 }
                 when_done();
             });
