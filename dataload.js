@@ -10,7 +10,7 @@ var argv = require('yargs').argv;
 var BUCKET = 's3-logs.couchbase.com';
 var config = require('config');
 var db, cache;
-var LOAD_PAUSE = 200;
+var LOAD_CONCUR = 350;
 
 // connection configuration to pass on to couchbase.connect(). Note that
 // while connecting with the server we are also opening the beer-sample
@@ -105,36 +105,54 @@ function get_all_files() {
 
 }
 
-function load_a_file(the_file) {
+function load_a_file(the_file, curr_num, when_done) {
     //console.log("loading " + the_file + "...");
+    console.log("loading number " + curr_num);
     var params = {
         Bucket: BUCKET, /* required */
         Key: the_file /* required */
     };
     s3.getObject(params, function(err, data) {
         //console.log("From S3, loading " + params.Key);
-        if (err) console.log(err, err.stack); // an error occurred
+        if (err) {
+            console.log(err, err.stack);
+        } // an error occurred
         else{
-            db.insert(the_file, data.Body.toString(), {"operationTimeout": 30000}, function(error, result) {
-                if (error) console.log(error, error.stack);
-            })
+            db.insert(the_file, data.Body.toString(), {"operationTimeout": 60000}, function(error, result) {
+                if (error) {
+                    console.log('finished ' + curr_num + ' WITH ERROR', error, error.stack);
+                } else {
+                    console.log('finished ' + curr_num);
+                }
+                when_done();
+            });
         }
     });
 
 }
 
-function rateLimitedForEach(list, period, fn, done) {
+function concurrencyLimitedForEach(list, concur, fn, done) {
+    if (list.length <= 0) {
+        return done();
+    }
     var i = 0;
-    function processOne() {
-        fn(list[i], i);
-        i++;
-        if (i < list.length) {
-            setTimeout(processOne(), period);
-        } else {
+    var proced = 0;
+    function doneOne() {
+        proced++;
+        if (proced >= list.length) {
             done();
+        } else {
+            processOne();
         }
     }
-    processOne();
+    function processOne() {
+        if (i >= list.length) return;
+        var curI = i++;
+        fn(list[curI], curI, doneOne);
+    }
+    for (var j = 0; j < concur; ++j) {
+        processOne();
+    }
 }
 
 
@@ -160,8 +178,9 @@ get_all_files().then(
         //for (var i=0; i<all_today.length; i++) {
         //    load_a_file(all_today[i]);
         //}
-        rateLimitedForEach(all_today, LOAD_PAUSE, load_a_file, function() {
+        concurrencyLimitedForEach(all_today, LOAD_CONCUR, load_a_file, function() {
             console.log("finished data load");
+            process.exit(0);
         });
 
     },
