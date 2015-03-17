@@ -11,6 +11,7 @@ var BUCKET = 's3-logs.couchbase.com';
 var config = require('config');
 var db, cache;
 var LOAD_CONCUR = 128;
+var OPERATION_TIMEOUT = 65536;
 
 // connection configuration to pass on to couchbase.connect(). Note that
 // while connecting with the server we are also opening the beer-sample
@@ -18,8 +19,7 @@ var LOAD_CONCUR = 128;
 var logdata_config = {
     connstr : config.get('logdata-connstr'),
     bucket : config.get('logdata-bucket'),
-    password : config.get('logdata-password'),
-    operationTimeout : 65536
+    password : config.get('logdata-password')
 };
 
 var logcache_config = {
@@ -35,6 +35,7 @@ function start_connections(logbucket_config, cachebucket_config) {
     var cb_ca = new couchbase.Cluster(cachebucket_config.connstr);
     db = cb_db.openBucket(logbucket_config.bucket, logbucket_config.password);
     db.on('connect', function (err) {
+        db.operationTimeout = OPERATION_TIMEOUT;
         if (err) {
             console.error("Failed to connect to cluster: " + err);
             process.exit(1);
