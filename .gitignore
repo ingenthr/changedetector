@@ -3,3 +3,4 @@ clustercert.txt
 *.swp
 /.idea/
 config/default.yaml
+views/welcome.html

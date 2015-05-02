@@ -1,27 +1,35 @@
 extends layout
 block content
-  h3 Download Overview
+  h3 Downloads by Version
+  p
+  canvas#byversion
+  p#byversion-legend
+  p
+    form.form-horizontal(id="charti_form")
+        label Start Date
+        input.span3(id="start_date", type="text", name="start_date", value="2015,1")
+        label End Date
+        input.span3(id="end_date", type="text", name="end_date", value="2015,6")
+        label Filter Less Than
+        input.span3(id="dl_filter", type="text", name="dl_filter", value="10")
+        label CE/EE Releases
+        //ul.nav.nav-pills#aggr_ce_ee
+        //    li.active
+        //        a#aggr_ce_ee_grouped Grouped
+        //    li
+        //        a#aggr_ce_ee_separate Separate
+        input.btn(id="update", type="Update", value="update")
+
+  h3 Download Details
   p
   canvas#overview
   p#overview-legend
-  p
-      form.form-horizontal(id="charti_form")
-          label Start Date
-          input.span3(id="start_date", type="text", name="start_date", value="2014,10")
-          label End Date
-          input.span3(id="end_date", type="text", name="end_date", value="2015,3")
-          label Filter Less Than
-          input.span3(id="dl_filter", type="text", name="dl_filter", value="10")
-          label CE/EE Releases
-          ul.nav.nav-pills#aggr_ce_ee
-              li.active
-               a#aggr_ce_ee_grouped Grouped
-              li
-               a#aggr_ce_ee_separate Separate
-          input.btn(id="update", type="Update", value="update")
+  p#errors
   .span12
-    p#errors
-  .span12
+  h3 4.0 downloads
+  p (work in progress)
+  canvas#40-overview
+  p#40-overview-legend
   h4 About this App
   p Couchbase Change Detector
   p 

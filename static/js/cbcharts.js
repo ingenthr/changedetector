@@ -3771,32 +3771,164 @@ var overviewChartOptions = {
 //console.log("After formatting with get_chart_data: \r\n" + JSON.stringify(get_chart_data(input_data)));
 var serverData;
 
-var aggr_server_data = function (serverData) {
 
+/**
+ * Function to aggregate server data along CE and EE lines.
+ *
+ * Input is serverData, output is an aggregated format similar enough to serverData that the chart can render it.
+ *
+ * @param serverData
+ * @returns {*}
+ */
+var aggr_ce_ee = function (serverData) {
     var aggrRes = serverData;
     //var tail_re = /.*\/(.*)$/;
     // releases/3.0.2/couchbase-server-enterprise_3.0.2-windows_x86.exe
     //var ce_ee_re = /(.*)\/(.*)\/(.*)_(.*)_(.*)/;
     //var test_re = /(.*)_(.*)_(.*)/;
-    var ce_ee_re = /.*couchbase-server-(.*)_|-.*/;
+    var ce_ee_re = /.*couchbase-server-(.*)_(.*)_(.*)/;
 
-    var num_ce;
+    var num_ce = 0;
+    var num_ee = 0;
+    var num_other = 0;
+
+    var dict_res_to_fmt;
 
     // if CE and EE are grouped
-    _.map(serverData, function(item) {
-        console.log(JSON.stringify(item));
+    _.map(serverData, function (item) {
+        console.log("aggregating item is: " + JSON.stringify(item));
         var re_results = ce_ee_re.exec(item.path[2]);
-        console.log(JSON.stringify(re_results));
-        if (ce_ee_re.test(item.path[2])) {
-            // set aside for now
+        //console.log(JSON.stringify(re_results));
+        if (re_results != null &&
+            re_results.constructor === Array) {
+            switch (re_results[1]) {
+                case "community" :
+                    num_ce = num_ce + item.num_downloads;
+                case "enterprise" :
+                    num_ee = num_ee + item.num_downloads;
+                default:
+                    num_other = num_other + item.num_downloads;
+            }
         }
     });
+
+    // get output in this format:
+    // [{"path":[2015,2,"releases/1.8.0/couchbase-server-community_x86_1.8.0.deb"],"num_downloads":0.000939510141758716},{"path":[2014,12,"releases/1.8.0/couchbase-server-community_x86_1.8.0.setup.exe"],"num_downloads":0.4403376607566907}
 
     return aggrRes;
 };
 
+function n_u_to_zero(varToCheck) {
+    if (typeof varToCheck == 'undefined' || varToCheck == null)
+      return 0;
+    else
+      return varToCheck;
+}
+
+/**
+ * Function to aggregate server data along versions.
+ *
+ * Input is serverData, output is an aggregated format similar enough to serverData that the chart can render it.
+ *
+ * @param serverData
+ * @returns {*}
+ */
+var aggr_version_broken = function (serverData) {
+    var aggrRes = serverData;
+    //var tail_re = /.*\/(.*)$/;
+    // releases/3.0.2/couchbase-server-enterprise_3.0.2-windows_x86.exe
+    // or releases/3.0.0/couchbase-server-enterprise-3.0.0-centos6.x86_64.rpm
+    //var ce_ee_re = /(.*)\/(.*)\/(.*)_(.*)_(.*)/;
+    //var test_re = /(.*)_(.*)_(.*)/;
+    var dlobj_re = /.*couchbase-server-(.*)_(.*)_(.*)/;
+    var dlobj_re2 = /.*couchbase-server-(.*)[\-](.*)[\-](.*)\.(.*)/;
+
+
+    undefined
+    var dict_res_to_fmt = {};
+
+    // if CE and EE are grouped
+    _.map(serverData, function (item) {
+        //console.log("aggregating item is: " + JSON.stringify(item));
+        var re_results = dlobj_re.exec(item.path[2]);
+        var re_results2 = dlobj_re2.exec(item.path[2]);
+        //console.log(JSON.stringify(re_results));
+        function checkIfVersion(token) {
+            var first_char = token[0];
+            var num_re = /^[1-4].*/;
+            if (num_re.exec(first_char) == null) {
+                console.log("Error, regex did not evaluate to a number: " + JSON.stringify(item.path[2]));
+            }
+        }
+
+        if (re_results != null &&
+            re_results.constructor === Array) {
+            checkIfVersion(re_results[3]);
+            dict_res_to_fmt[re_results[3]] = n_u_to_zero(dict_res_to_fmt[re_results[3]])+ item.num_downloads;
+        } else if (re_results2 !=null &&
+            re_results2.constructor === Array) {
+            checkIfVersion(re_results2[2]);
+            dict_res_to_fmt[re_results2[2]] = n_u_to_zero(dict_res_to_fmt[re_results2[2]]) + item.num_downloads;
+        } else {
+          console.log("Error when aggregating, RE did not evaluate.  Tried to re: " + JSON.stringify(item.path[2]) +
+          "\r\nValue is: " + JSON.stringify(re_results));
+        }
+
+    });
+
+    console.log("dict from aggr_version is: " + JSON.stringify(dict_res_to_fmt));
+
+    // get output in this format:
+    // [{"path":[2015,2,"releases/1.8.0/couchbase-server-community_x86_1.8.0.deb"],"num_downloads":0.000939510141758716},{"path":[2014,12,"releases/1.8.0/couchbase-server-community_x86_1.8.0.setup.exe"],"num_downloads":0.4403376607566907}
+
+    return aggrRes;
+};
+
+/**
+ * Function to aggregate server data along versions.
+ *
+ * Input is serverData, output is an aggregated format similar enough to serverData that the chart can render it.
+ *
+ * @param serverData
+ * @returns {*}
+ */
+var aggr_version = function (dataToAggregate) {
+    var dlobj_re = /.*couchbase-server-.*(\d\.)(\d\.)(\d).*/;
+
+    var dict_res_to_fmt = {};
+    var arr_res_fmtd = [];
+
+    // aggregate by the version RE outlined above
+    _.map(dataToAggregate, function (item) {
+        var re_results = dlobj_re.exec(item.path[2]);
+        if (re_results == null) {
+            console.log("Error, could not re match version string in " + item.path[2]);
+            return;
+        }
+        var date_ver_key = new Array([item.path[0],item.path[1],re_results[1]]);
+        dict_res_to_fmt[date_ver_key] = n_u_to_zero(dict_res_to_fmt[date_ver_key]) + item.num_downloads;
+    });
+
+    for (var prop in dict_res_to_fmt) {
+        var elements = prop.split(",");
+        var path_to_insert = { path: new Array(parseInt(elements[0]), parseInt(elements[1]), elements[2] + "x.x"),
+            num_downloads: dict_res_to_fmt[prop]};
+        arr_res_fmtd.push(path_to_insert);
+
+    }
+
+    // get output in this format:
+    // [{"path":[2015,2,"releases/1.8.0/couchbase-server-community_x86_1.8.0.deb"],"num_downloads":0.000939510141758716},{"path":[2014,12,"releases/1.8.0/couchbase-server-community_x86_1.8.0.setup.exe"],"num_downloads":0.4403376607566907}
+
+    return arr_res_fmtd;
+};
+
+
+
 var overviewBarChart = null;
 function post_fetch_render() {
+
+    // regular overview
     $('#overview').attr({width:CHART_WIDTH,height:CHART_HEIGHT}).css({width:'750px',height:'400px'});
     //var chartData = get_chart_data(serverData);
     var newChartData = get_chart_data2(serverData);
@@ -3812,6 +3944,70 @@ function post_fetch_render() {
     var legend = overviewBarChart.generateLegend();
     $('#overview-legend').replaceWith(legend);
 }
+
+
+var fourOhChartOptions = {
+    legendTemplate : '<ol id=\"40-overview-legend\">'
+    +'<% for (var i=0; i<datasets.length; i++) { %>'
+    +'<li>'
+    +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'
+    +' <span style=\"background-color:<%=datasets[i].fillColor%>\">'
+    +'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+    +'</span>'
+    +'</li>'
+    +'<% } %>'
+    +'</ol>'
+};
+
+var fourOhOverviewBarChart = null;
+var fourOhCtx = $("#40-overview").get(0).getContext("2d");
+fourOhCtx.translate(0.5, 0.5);
+function render_40_downloads(data) {
+    //4.0 current
+    $('#40-overview').attr({width:CHART_WIDTH,height:CHART_HEIGHT}).css({width:'750px',height:'400px'});
+    //var chartData = get_chart_data(serverData);
+    var fourOhCanvas = $('40-overview');
+    fourOhCtx.clearRect(0, 0, fourOhCanvas.width, fourOhCanvas.height);
+    fourOhCtx.translate(0.5, 0.5);
+    if (fourOhOverviewBarChart) {
+        fourOhOverviewBarChart.destroy();
+    }
+    fourOhOverviewBarChart = new Chart(fourOhCtx).Bar(data, fourOhChartOptions);
+    var fourOhLegend = fourOhOverviewBarChart.generateLegend();
+    $('#40-overview-legend').replaceWith(fourOhLegend);
+}
+
+
+var byversionChartOptions = {
+    legendTemplate : '<ol id=\"byversion-legend\">'
+    +'<% for (var i=0; i<datasets.length; i++) { %>'
+    +'<li>'
+    +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'
+    +' <span style=\"background-color:<%=datasets[i].fillColor%>\">'
+    +'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+    +'</span>'
+    +'</li>'
+    +'<% } %>'
+    +'</ol>'
+};
+
+var versionBarChart = null;
+var verctx = $("#byversion").get(0).getContext("2d");
+verctx.translate(0.5, 0.5);
+function render_version_chart(data) {
+    $('#byversion').attr({width:CHART_WIDTH,height:CHART_HEIGHT}).css({width:'750px',height:'400px'});
+    var newChartData = get_chart_data2(data);
+    var canvas = $('byversion');
+    verctx.clearRect(0, 0, canvas.width, canvas.height);
+    verctx.translate(0.5, 0.5);
+    if (versionBarChart) {
+        versionBarChart.destroy();
+    }
+    versionBarChart = new Chart(verctx).Bar(newChartData, byversionChartOptions);
+    var legend = versionBarChart.generateLegend();
+    $('#byversion-legend').replaceWith(legend);
+}
+
 
 //when really running, use this
 $.getJSON(get_query_string(), {}, function(data){
@@ -3829,9 +4025,15 @@ $("#update").bind( "click", function() {
     var request_string = get_query_string();
     $.getJSON(request_string, {}, function(data){
         serverData = data;
+        var versionAggregatedData = aggr_version(serverData);
+        console.log("results from aggregation: " + JSON.stringify(versionAggregatedData));
+        render_version_chart(versionAggregatedData);
         post_fetch_render();
+
+        //console.log("unaggregated: " + JSON.stringify(serverData) + "\r\n\r\naggregated: " + JSON.stringify(versionAggregatedData));
+
     });
-    console.log("request_string is: " + request_string);
+    //console.log("request_string is: " + request_string);
 });
 
 $("#aggr_ce_ee li").children().bind("click", function(jq_event) {
@@ -3843,6 +4045,7 @@ $("#aggr_ce_ee li").children().bind("click", function(jq_event) {
 $.getJSON(get_query_string(), {}, function(data){
     serverData = data;
     post_fetch_render();
+    render_version_chart(aggr_version(serverData));
 });
 
 // use this if offline
