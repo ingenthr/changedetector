@@ -3822,65 +3822,6 @@ function n_u_to_zero(varToCheck) {
  * @param serverData
  * @returns {*}
  */
-var aggr_version_broken = function (serverData) {
-    var aggrRes = serverData;
-    //var tail_re = /.*\/(.*)$/;
-    // releases/3.0.2/couchbase-server-enterprise_3.0.2-windows_x86.exe
-    // or releases/3.0.0/couchbase-server-enterprise-3.0.0-centos6.x86_64.rpm
-    //var ce_ee_re = /(.*)\/(.*)\/(.*)_(.*)_(.*)/;
-    //var test_re = /(.*)_(.*)_(.*)/;
-    var dlobj_re = /.*couchbase-server-(.*)_(.*)_(.*)/;
-    var dlobj_re2 = /.*couchbase-server-(.*)[\-](.*)[\-](.*)\.(.*)/;
-
-
-    undefined
-    var dict_res_to_fmt = {};
-
-    // if CE and EE are grouped
-    _.map(serverData, function (item) {
-        //console.log("aggregating item is: " + JSON.stringify(item));
-        var re_results = dlobj_re.exec(item.path[2]);
-        var re_results2 = dlobj_re2.exec(item.path[2]);
-        //console.log(JSON.stringify(re_results));
-        function checkIfVersion(token) {
-            var first_char = token[0];
-            var num_re = /^[1-4].*/;
-            if (num_re.exec(first_char) == null) {
-                console.log("Error, regex did not evaluate to a number: " + JSON.stringify(item.path[2]));
-            }
-        }
-
-        if (re_results != null &&
-            re_results.constructor === Array) {
-            checkIfVersion(re_results[3]);
-            dict_res_to_fmt[re_results[3]] = n_u_to_zero(dict_res_to_fmt[re_results[3]])+ item.num_downloads;
-        } else if (re_results2 !=null &&
-            re_results2.constructor === Array) {
-            checkIfVersion(re_results2[2]);
-            dict_res_to_fmt[re_results2[2]] = n_u_to_zero(dict_res_to_fmt[re_results2[2]]) + item.num_downloads;
-        } else {
-          console.log("Error when aggregating, RE did not evaluate.  Tried to re: " + JSON.stringify(item.path[2]) +
-          "\r\nValue is: " + JSON.stringify(re_results));
-        }
-
-    });
-
-    console.log("dict from aggr_version is: " + JSON.stringify(dict_res_to_fmt));
-
-    // get output in this format:
-    // [{"path":[2015,2,"releases/1.8.0/couchbase-server-community_x86_1.8.0.deb"],"num_downloads":0.000939510141758716},{"path":[2014,12,"releases/1.8.0/couchbase-server-community_x86_1.8.0.setup.exe"],"num_downloads":0.4403376607566907}
-
-    return aggrRes;
-};
-
-/**
- * Function to aggregate server data along versions.
- *
- * Input is serverData, output is an aggregated format similar enough to serverData that the chart can render it.
- *
- * @param serverData
- * @returns {*}
- */
 var aggr_version = function (dataToAggregate) {
     var dlobj_re = /.*couchbase-server-.*(\d\.)(\d\.)(\d).*/;
 
