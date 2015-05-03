@@ -33,4 +33,8 @@ block content
   h4 About this App
   p Couchbase Change Detector
   p 
-    | This app uses Couchbase to visualize S3 download logs of Couchbase products.
+    | This app uses Couchbase to visualize S3 download logs of Couchbase products.  S3 logs are loaded into Couchbase
+    | as individual elements (non-JSON) and then processed as Couchbase Views.  Couchbase views are built from the
+    | parsed log entries with the item, year, month, day and number of bytes.  The node.js app will look up object sizes
+    | on S3 and based on the object size and the number of bytes retrieved in the given range, it will calculate and
+    | round to the nearest integer on the number of downloads.
