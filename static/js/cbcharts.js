@@ -3755,18 +3755,7 @@ function genColor(str) {
 var ctx = $("#overview").get(0).getContext("2d");
 ctx.translate(0.5, 0.5);
 
-//legendTemplate takes a template as a string, you can populate the template with values from your dataset
-var overviewChartOptions = {
-    legendTemplate : '<ol id=\"overview-legend\">'
-    +'<% for (var i=0; i<datasets.length; i++) { %>'
-    +'<li>'
-    +'<span style=\"background-color:<%=datasets[i].fillColor%>\">'
-    +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'
-    +'</span>'
-    +'</li>'
-    +'<% } %>'
-    +'</ol>'
-};
+
 
 //console.log("After formatting with get_chart_data: \r\n" + JSON.stringify(get_chart_data(input_data)));
 var serverData;
@@ -3923,7 +3912,18 @@ var aggr_version = function (dataToAggregate) {
     return arr_res_fmtd;
 };
 
-
+var overviewChartOptions = {
+    legendTemplate : '<ol id=\"overview-legend\">'
+    +'<% for (var i=0; i<datasets.length; i++) { %>'
+    +'<li>'
+    +'<span style=\"background-color:<%=datasets[i].fillColor%>\">'
+    +'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+    +'</span> '
+    +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'
+    +'</li>'
+    +'<% } %>'
+    +'</ol>'
+};
 
 var overviewBarChart = null;
 function post_fetch_render() {
@@ -3950,10 +3950,10 @@ var fourOhChartOptions = {
     legendTemplate : '<ol id=\"40-overview-legend\">'
     +'<% for (var i=0; i<datasets.length; i++) { %>'
     +'<li>'
-    +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'
-    +' <span style=\"background-color:<%=datasets[i].fillColor%>\">'
+    +'<span style=\"background-color:<%=datasets[i].fillColor%>\">'
     +'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-    +'</span>'
+    +'</span> '
+    +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'
     +'</li>'
     +'<% } %>'
     +'</ol>'
