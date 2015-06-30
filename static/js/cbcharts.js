@@ -3956,25 +3956,6 @@ var fourOhChartOptions = {
     +'</ol>'
 };
 
-var fourOhOverviewBarChart = null;
-var fourOhCtx = $("#40-overview").get(0).getContext("2d");
-fourOhCtx.translate(0.5, 0.5);
-function render_40_downloads(data) {
-    //4.0 current
-    $('#40-overview').attr({width:CHART_WIDTH,height:CHART_HEIGHT}).css({width:'750px',height:'400px'});
-    //var chartData = get_chart_data(serverData);
-    var fourOhCanvas = $('40-overview');
-    fourOhCtx.clearRect(0, 0, fourOhCanvas.width, fourOhCanvas.height);
-    fourOhCtx.translate(0.5, 0.5);
-    if (fourOhOverviewBarChart) {
-        fourOhOverviewBarChart.destroy();
-    }
-    fourOhOverviewBarChart = new Chart(fourOhCtx).Bar(data, fourOhChartOptions);
-    var fourOhLegend = fourOhOverviewBarChart.generateLegend();
-    $('#40-overview-legend').replaceWith(fourOhLegend);
-}
-
-
 var byversionChartOptions = {
     legendTemplate : '<ol id=\"byversion-legend\">'
     +'<% for (var i=0; i<datasets.length; i++) { %>'
