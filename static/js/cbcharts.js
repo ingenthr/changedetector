@@ -3862,7 +3862,7 @@ var aggr_version = function (dataToAggregate) {
  * @returns {*}
  */
 var aggr_win_plat = function (dataToAggregate) {
-    var dlobj_re = /.*couchbase-server-.*(\d\.)(\d\.)(\d).*\_(.*).exe/;
+    var dlobj_re = /.*couchbase-server-.*(\d\.)(\d\.)(\d).*\_.*.exe/;
 
     var dict_res_to_fmt = {};
     var arr_res_fmtd = [];
@@ -3883,7 +3883,13 @@ var aggr_win_plat = function (dataToAggregate) {
             console.log("Error, could not re match version string in " + item.path[2]);
             return;
         }
-        var date_ver_key = new Array([item.path[0],item.path[1],re_results[4]]);
+
+        var arch = "x86";
+        if (item.path[2].includes("64")) {
+            arch = "x86_64";
+        }
+
+        var date_ver_key = new Array([item.path[0],item.path[1],arch]);
         dict_res_to_fmt[date_ver_key] = n_u_to_zero(dict_res_to_fmt[date_ver_key]) + item.num_downloads;
     });
 
