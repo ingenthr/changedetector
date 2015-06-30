@@ -3853,6 +3853,56 @@ var aggr_version = function (dataToAggregate) {
     return arr_res_fmtd;
 };
 
+/**
+ * Function to aggregate server data for windows platforms.
+ *
+ * Input is serverData, output is an aggregated format similar enough to serverData that the chart can render it.
+ *
+ * @param serverData
+ * @returns {*}
+ */
+var aggr_win_plat = function (dataToAggregate) {
+    var dlobj_re = /.*couchbase-server-.*(\d\.)(\d\.)(\d).*\_(.*).exe/;
+
+    var dict_res_to_fmt = {};
+    var arr_res_fmtd = [];
+
+    //releases/3.0.1/couchbase-server-community_3.0.1-windows_amd64.exe
+    //releases/3.0.1/couchbase-server-community_3.0.1-windows_x86.exe
+    //releases/2.0.1/couchbase-server-community_x86_64_2.0.1.setup.exe   <<< AARRRGHHH!  works with this: /.*couchbase-server-.*(\d\.)(\d\.)(\d).*[\.|_](?:setup)?.exe/
+    //releases/2.2.0/couchbase-server-community_2.2.0_x86_64.setup.exe
+    //releases/2.2.0/couchbase-server-community_2.2.0_x86.setup.exe
+    //releases/2.5.1/couchbase-server-enterprise_2.5.1_x86.setup.exe
+    //releases/2.5.0/couchbase-server-enterprise_2.5.0_x86_64.setup.exe
+    // https://regex101.com/r/gD5zT1/1
+
+    // aggregate by the version RE outlined above
+    _.map(dataToAggregate, function (item) {
+        var re_results = dlobj_re.exec(item.path[2]);
+        if (re_results == null) {
+            console.log("Error, could not re match version string in " + item.path[2]);
+            return;
+        }
+        var date_ver_key = new Array([item.path[0],item.path[1],re_results[4]]);
+        dict_res_to_fmt[date_ver_key] = n_u_to_zero(dict_res_to_fmt[date_ver_key]) + item.num_downloads;
+    });
+
+    for (var prop in dict_res_to_fmt) {
+        var elements = prop.split(",");
+        var path_to_insert = { path: new Array(parseInt(elements[0]), parseInt(elements[1]), elements[2]),
+            num_downloads: dict_res_to_fmt[prop]};
+        arr_res_fmtd.push(path_to_insert);
+
+    }
+
+    // get output in this format:
+    // [{"path":[2015,2,"releases/1.8.0/couchbase-server-community_x86_1.8.0.deb"],"num_downloads":0.000939510141758716},{"path":[2014,12,"releases/1.8.0/couchbase-server-community_x86_1.8.0.setup.exe"],"num_downloads":0.4403376607566907}
+
+    console.log("win-plat aggr results" + JSON.stringify(arr_res_fmtd));
+    return arr_res_fmtd;
+};
+
+
 var overviewChartOptions = {
     legendTemplate : '<ol id=\"overview-legend\">'
     +'<% for (var i=0; i<datasets.length; i++) { %>'
@@ -3950,6 +4000,37 @@ function render_version_chart(data) {
 }
 
 
+var winPlatChartOptions = {
+    legendTemplate : '<ol id=\"win-plat-legend\">'
+    +'<% for (var i=0; i<datasets.length; i++) { %>'
+    +'<li>'
+    +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'
+    +' <span style=\"background-color:<%=datasets[i].fillColor%>\">'
+    +'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+    +'</span>'
+    +'</li>'
+    +'<% } %>'
+    +'</ol>'
+};
+
+var winPlatBarChart = null;
+var winplatctx = $("#win-plat").get(0).getContext("2d");
+winplatctx.translate(0.5, 0.5);
+function render_win_plat_chart(data) {
+    $('#win-plat').attr({width:CHART_WIDTH,height:CHART_HEIGHT}).css({width:'750px',height:'400px'});
+    var newChartData = get_chart_data2(data);
+    var canvas = $('win-plat');
+    winplatctx.clearRect(0, 0, canvas.width, canvas.height);
+    winplatctx.translate(0.5, 0.5);
+    if (winPlatBarChart) {
+        winPlatBarChart.destroy();
+    }
+    winPlatBarChart = new Chart(winplatctx).Bar(newChartData, winPlatChartOptions);
+    var legend = winPlatBarChart.generateLegend();
+    $('#win-plat-legend').replaceWith(legend);
+}
+
+
 //when really running, use this
 $.getJSON(get_query_string(), {}, function(data){
     serverData = data;
@@ -3987,6 +4068,7 @@ $.getJSON(get_query_string(), {}, function(data){
     serverData = data;
     post_fetch_render();
     render_version_chart(aggr_version(serverData));
+    render_win_plat_chart(aggr_win_plat(serverData));
 });
 
 // use this if offline
