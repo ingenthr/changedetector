@@ -4021,6 +4021,7 @@ var barChartData = {
 
 
 var byversionouChartOptions = {
+    responsive : true,
     legendTemplate : '<ol id=\"byversion-legend\">'
     +'<% for (var i=0; i<datasets.length; i++) { %>'
     +'<li>'
@@ -4045,10 +4046,9 @@ function render_versionou_chart(data) {
     if (versionouBarChart) {
         versionouBarChart.destroy();
     }
-    versionouBarChart = new Chart(verouctx).StackedBar(barChartData, /* byversionouChartOptions */ {
-        responsive : true
-    });
+    versionouBarChart = new Chart(verouctx).StackedBar(barChartData, byversionouChartOptions);
     var legend = versionouBarChart.generateLegend();
+    console.log("Legend is " + legend);
     $('#byversionou-legend').replaceWith(legend);
 }
 
