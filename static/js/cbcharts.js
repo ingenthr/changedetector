@@ -3793,8 +3793,10 @@ var aggr_ce_ee = function (serverData) {
             switch (re_results[1]) {
                 case "community" :
                     num_ce = num_ce + item.num_downloads;
+                    break;
                 case "enterprise" :
                     num_ee = num_ee + item.num_downloads;
+                    break;
                 default:
                     num_other = num_other + item.num_downloads;
             }
@@ -3819,7 +3821,7 @@ function n_u_to_zero(varToCheck) {
  *
  * Input is serverData, output is an aggregated format similar enough to serverData that the chart can render it.
  *
- * @param serverData
+ * @param dataToAggregate
  * @returns {*}
  */
 var aggr_version = function (dataToAggregate) {
@@ -3841,7 +3843,7 @@ var aggr_version = function (dataToAggregate) {
 
     for (var prop in dict_res_to_fmt) {
         var elements = prop.split(",");
-        var path_to_insert = { path: new Array(parseInt(elements[0]), parseInt(elements[1]), elements[2] + "x.x"),
+        var path_to_insert = { path: [parseInt(elements[0]), parseInt(elements[1]), elements[2] + "x.x"],
             num_downloads: dict_res_to_fmt[prop]};
         arr_res_fmtd.push(path_to_insert);
 
@@ -3858,7 +3860,7 @@ var aggr_version = function (dataToAggregate) {
  *
  * Input is serverData, output is an aggregated format similar enough to serverData that the chart can render it.
  *
- * @param serverData
+ * @param dataToAggregate
  * @returns {*}
  */
 var aggr_win_plat = function (dataToAggregate) {
@@ -3880,7 +3882,10 @@ var aggr_win_plat = function (dataToAggregate) {
     _.map(dataToAggregate, function (item) {
         var re_results = dlobj_re.exec(item.path[2]);
         if (re_results == null) {
-            console.log("Error, could not re match version string in " + item.path[2]);
+            /* TODO: in hindsight, our file paths aren't regular so regex was a mistake here.  It's close enough
+             *       for now, but there are a bunch that don't match.
+             */
+            console.log("Warning: could not re match version string in " + item.path[2]);
             return;
         }
 
@@ -3904,7 +3909,7 @@ var aggr_win_plat = function (dataToAggregate) {
     // get output in this format:
     // [{"path":[2015,2,"releases/1.8.0/couchbase-server-community_x86_1.8.0.deb"],"num_downloads":0.000939510141758716},{"path":[2014,12,"releases/1.8.0/couchbase-server-community_x86_1.8.0.setup.exe"],"num_downloads":0.4403376607566907}
 
-    console.log("win-plat aggr results" + JSON.stringify(arr_res_fmtd));
+    //console.log("win-plat aggr results" + JSON.stringify(arr_res_fmtd));
     return arr_res_fmtd;
 };
 
@@ -4052,7 +4057,7 @@ $("#update").bind( "click", function() {
     //console.log("request_string is: " + request_string);
 });
 
-$("#aggr_ce_ee li").children().bind("click", function(jq_event) {
+$("#aggr_ce_ee").find("li").children().bind("click", function(jq_event) {
     alert(JSON.stringify(jq_event.target.id));
     //jq_event.target.addClass("active");
 });
