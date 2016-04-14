@@ -7,9 +7,10 @@ block content
   p
     form.form-horizontal(id="charti_form")
         label Start Date
-        input.span3(id="start_date", type="text", name="start_date", value="2015,1")
+        // 6 months ago
+        input.span3(id="start_date", type="text", name="start_date", value="#{moment(Date.now()-1.577e+10).format('MM/YYYY')}")
         label End Date
-        input.span3(id="end_date", type="text", name="end_date", value="2015,8")
+        input.span3(id="end_date", type="text", name="end_date", value="#{moment(Date.now()).format('MM/YYYY')}")
         label Filter Less Than
         input.span3(id="dl_filter", type="text", name="dl_filter", value="10")
         //label CE/EE Releases

@@ -4092,9 +4092,16 @@ $.getJSON(get_query_string(), {}, function(data){
 
 // rerender from here
 function get_query_string() {
+
+    // convert start date and end date to needed comma format
+    var start = String($("#start_date").val());
+    var end = String($("#end_date").val());
+    var start_arr = start.split("/");
+    var end_arr = end.split("/");
+
     return "/downloads/server?start_range=" +
-        encodeURIComponent("[" + ($("#start_date").val() + "]")) + "&end_range=" +
-        encodeURIComponent("[" + ($("#end_date").val()) + "]");
+        encodeURIComponent("[" + start_arr[1] + "," + parseInt(start_arr[0], 10) + "]") + "&end_range=" +
+        encodeURIComponent("[" + end_arr[1] + "," + parseInt(end_arr[0], 10) + "]");
 }
 $("#update").bind( "click", function() {
     var request_string = get_query_string();

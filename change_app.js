@@ -56,7 +56,8 @@ exports.is_server_download = is_server_download;
   app.use(express.static('static'));
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-  app.locals.pretty = true;
+      app.locals.moment = require('moment');
+      app.locals.pretty = true;
 
   // Index page redirect
   app.get('/', function (req, res) {
