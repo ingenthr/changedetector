@@ -3987,72 +3987,6 @@ function render_version_chart(data) {
 }
 
 
-var randomScalingFactor = function(){ return Math.round(Math.random()*100)};
-var randomColorFactor = function(){ return Math.round(Math.random()*255)};
-
-
-var barChartData = {
-    labels : ["January","February","March","April","May","June","July"],
-    datasets : [
-        {
-            fillColor : "rgba(220,220,220,0.5)",
-            strokeColor : "rgba(220,220,220,0.8)",
-            highlightFill: "rgba(220,220,220,0.75)",
-            highlightStroke: "rgba(220,220,220,1)",
-            data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
-        },
-        {
-            fillColor : "rgba(151,187,205,0.5)",
-            strokeColor : "rgba(151,187,205,0.8)",
-            highlightFill : "rgba(151,187,205,0.75)",
-            highlightStroke : "rgba(151,187,205,1)",
-            data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
-        },
-        {
-            fillColor : "rgba(240,73,73,0.5)",
-            strokeColor : "rgba(240,73,73,0.8)",
-            highlightFill : "rgba(240,73,73,0.75)",
-            highlightStroke : "rgba(240,73,73,1)",
-            data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
-        }
-    ]
-};
-
-
-
-var byversionouChartOptions = {
-    responsive : true,
-    legendTemplate : '<ol id=\"byversion-legend\">'
-    +'<% for (var i=0; i<datasets.length; i++) { %>'
-    +'<li>'
-    +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'
-    +' <span style=\"background-color:<%=datasets[i].fillColor%>\">'
-    +'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-    +'</span>'
-    +'</li>'
-    +'<% } %>'
-    +'</ol>'
-};
-
-var versionouBarChart = null;
-var verouctx = $("#byversionou").get(0).getContext("2d");
-verouctx.translate(0.5, 0.5);
-function render_versionou_chart(data) {
-    $('#byversionou').attr({width:CHART_WIDTH,height:CHART_HEIGHT}).css({width:'750px',height:'400px'});
-    var newChartData = get_chart_data2(data);
-    var canvas = $('byversionou');
-    verouctx.clearRect(0, 0, canvas.width, canvas.height);
-    verouctx.translate(0.5, 0.5);
-    if (versionouBarChart) {
-        versionouBarChart.destroy();
-    }
-    versionouBarChart = new Chart(verouctx).StackedBar(barChartData, byversionouChartOptions);
-    var legend = versionouBarChart.generateLegend();
-    console.log("Legend is " + legend);
-    $('#byversionou-legend').replaceWith(legend);
-}
-
-
 var winPlatChartOptions = {
     legendTemplate : '<ol id=\"win-plat-legend\">'
     +'<% for (var i=0; i<datasets.length; i++) { %>'
@@ -4110,7 +4044,6 @@ $("#update").bind( "click", function() {
         var versionAggregatedData = aggr_version(serverData);
         console.log("results from aggregation: " + JSON.stringify(versionAggregatedData));
         render_version_chart(versionAggregatedData);
-        render_versionou_chart(barChartData);
         post_fetch_render();
 
         //console.log("unaggregated: " + JSON.stringify(serverData) + "\r\n\r\naggregated: " + JSON.stringify(versionAggregatedData));
@@ -4130,7 +4063,6 @@ $.getJSON(get_query_string(), {}, function(data){
     post_fetch_render();
     render_version_chart(aggr_version(serverData));
     render_win_plat_chart(aggr_win_plat(serverData));
-    render_versionou_chart(barChartData);
 });
 
 // use this if offline

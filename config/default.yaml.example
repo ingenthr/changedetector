@@ -1,3 +1,7 @@
+#Edit this file to match your deployment cluster.
+
+# SSL example:
+#logdata-connstr: couchbases://myhost/?certpath=%2Fhome%2Fingenthr%2Fsrc%2Fchangedetector%2Fclustercert.txt
 logdata-connstr: couchbase://localhost/
 logdata-bucket: s3logs
 logdata-password: letmein
