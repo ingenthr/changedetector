@@ -1,5 +1,6 @@
 node_modules
 clustercert.txt
+clustercert*.txt
 *.swp
 /.idea/
 config/default.yaml
